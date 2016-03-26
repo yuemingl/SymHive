@@ -67,4 +67,23 @@ JIT Compiled: JITFunc_4862f4f488514413b468026c8441b307(x): x + pow(x,2) + pow(x,
 997.4362248224004
 Time taken: 0.058 seconds, Fetched: 21 row(s)
 ```
-
+Symbolic expression examples
+```sh
+f=x^2+y^2 # Define variable f which is the expression x^2+y^2
+a=[x,y,z,t]; b=1:10 # An array of expressions and integers (Java native arraies)
+a[0:2] # Get a[0],a[1],a[2]
+b[1,3,7:9] # b[1],b[3],b[7],b[8],b[9]
+u=[1,2,3]'; v=a'; w=vector(1,2,3) # Vectors (they are not Java native arraies; ' means transpose)
+solve(cos(x)==x) # Solve an equation
+model_fit(eq(y,a*x/(b+x),[x],[a,b]),[0.9,0.2],[[0.038,0.05],[0.194,0.127],[0.425,0.094],[0.626,0.2122],[1.253,0.2729],[2.5,0.2665],[3.74,0.3317]],100,0.0001) # Fit a model
+f=compile(x+y); f(2,3) # Compile an expression to a java function in bytecodes and eval it
+f=func("F",x,y) # Define abstract functions
+#Math functions you can use: sqrt, sin, cos, tan, exp, log, log2, log10, abs
+diff(sin(x^3),x) # Differentiation
+f = integrate(sin(x),interval(x,0,pi,0.001)); ff=compile(f); ff() # Integration
+dot(vector(x,y),vector(y,z)); dot([1,2,3]',[4,5,6]') # Dot product
+grad(sin(x+y)) # Gradient
+map(x^_, 1:5) # [x, pow(x,2), pow(x,3), pow(x,4), pow(x,5)]
+reduce(_+__, map(x^_, 1:5)) # x + pow(x,2) + pow(x,3) + pow(x,4) + pow(x,5)
+reduce(diff(func("_",x),x), map(x^3, 1:3)) # 6*x
+```
