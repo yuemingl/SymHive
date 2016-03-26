@@ -2,33 +2,51 @@ package symjava.apache.hive.SymHive;
 
 import lc.bytecode.ShuntingYardParser;
 
-import org.apache.hadoop.hive.ql.exec.Description;
-import org.apache.hadoop.hive.ql.exec.UDF;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
 
 import symjava.bytecode.BytecodeFunc;
 import symjava.symbolic.Expr;
 import symjava.symbolic.utils.JIT;
 
-public class SymExpr extends UDF {
+class SymExpr extends GenericUDF {
+	boolean compiled;
+	BytecodeFunc f;
 
-	@Description(name = "SymExpr", 
-			value = "returns the evaluating result of an expression", 
-			extended = "SELECT symexpr(\"diff(sqrt(x*x+y*y),x)\", x, y);")
-	public String evaluate(String[] args) {
-		double ret = 0;
-		ShuntingYardParser p = new ShuntingYardParser();
-		Expr expr = p.quickParse(args[0]);
-		BytecodeFunc f = JIT.compile(expr);
-		double[] inputs = new double[args.length-1];
-		for(int i=1; i<args.length; i++)
-			inputs[i-1] = Double.parseDouble(args[i]); 
-		ret = f.apply(inputs);
+	@Override
+	public String getDisplayString(String[] arg0) {
+		return "sym_expr()";
+	}
+
+	@Override
+	public ObjectInspector initialize(ObjectInspector[] arguments)
+			throws UDFArgumentException {
+		this.compiled = false;
+		// the return type of our function is a String, so we provide the
+		// correct object inspector
+		return PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+	}
+
+	@Override
+	public Object evaluate(DeferredObject[] arguments) throws HiveException {
+		StringObjectInspector soi = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+		if (!compiled) {
+			ShuntingYardParser p = new ShuntingYardParser();
+			String expr = soi.getPrimitiveJavaObject(arguments[0].get());
+			Expr pe = p.quickParse(expr);
+			f = JIT.compile(pe);
+			compiled = true;
+		}
+		double[] inputs = new double[arguments.length - 1];
+		for (int i = 1; i < arguments.length; i++)
+			inputs[i - 1] = Double.parseDouble(soi
+					.getPrimitiveJavaObject(arguments[i].get()));
+		double ret = f.apply(inputs);
 		return String.valueOf(ret);
 	}
 
-	public static void main(String[] args) {
-		SymExpr s = new SymExpr();
-		String ret = s.evaluate(new String[]{"sqrt(x*x+y*y)","3.0","4.0"});
-		System.out.println(ret);
-	}
 }
