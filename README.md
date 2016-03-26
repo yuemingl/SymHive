@@ -39,6 +39,7 @@ load data local inpath '/Users/yueming.liu/gauss_newton.txt' into table gauss_ne
 Another example:
 
 ```sh
+hive> create temporary function sym_expr as 'symjava.apache.hive.SymHive.SymExpr';
 hive> select sym_expr("reduce(_+__, map(x^_,1:5))",x) from gauss_newton;
 OK
 x + pow(x,2) + pow(x,3) + pow(x,4) + pow(x,5)
