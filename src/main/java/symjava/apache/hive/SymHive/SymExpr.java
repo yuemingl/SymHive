@@ -1,5 +1,7 @@
 package symjava.apache.hive.SymHive;
 
+import java.util.List;
+
 import lc.bytecode.ShuntingYardParser;
 
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
@@ -37,8 +39,8 @@ class SymExpr extends GenericUDF {
 		if (!compiled) {
 			ShuntingYardParser p = new ShuntingYardParser();
 			String expr = soi.getPrimitiveJavaObject(arguments[0].get());
-			Expr pe = p.quickParse(expr);
-			f = JIT.compile(pe);
+			List<Object> pe = p.fullParse(expr);
+			f = JIT.compile((Expr)pe.get(pe.size()-1));
 			compiled = true;
 		}
 		double[] inputs = new double[arguments.length - 1];
