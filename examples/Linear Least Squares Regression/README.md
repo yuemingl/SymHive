@@ -1,7 +1,6 @@
 This example is taken from here:
 http://www.cyclismo.org/tutorial/R/linearLeastSquares.html
-<<<<<<< HEAD
-Given the data
+Given the data:
 ```sh
 > year <- c(2000 ,   2001  ,  2002  ,  2003 ,   2004)
 > rate <- c(9.34 ,   8.50  ,  7.62  ,  6.93  ,  6.60)
@@ -9,9 +8,7 @@ fit the model:
 rate = (slope)year + intercept
 ```
 SymHive solution:
-=======
 
->>>>>>> 2dc978b82c7cb23cb77277f5b3745dd9019c238f
 ```sh
 add jar /Users/yueming.liu/SymHive.jar;
 
@@ -26,11 +23,7 @@ Loading data to table default.year_rate
 Table default.year_rate stats: [numFiles=1, totalSize=49]
 OK
 
-<<<<<<< HEAD
 hive> select sym_opt("eq(y,a*x+b, [x],[a,b])", 0, 0, year, rate) from year_rate group by 1 --Note: 0,0 are the initial guess of a,b; We use group by 1 to group the data for the model
-=======
-hive> select sym_opt("eq(y,a*x+b, [x],[a,b])",1,1,year, rate) from year_rate group by 1;
->>>>>>> 2dc978b82c7cb23cb77277f5b3745dd9019c238f
 Warning: Using constant number  1 in group by. If you try to use position alias when hive.groupby.orderby.position.alias is false, the position alias will be ignored.
 Query ID = yueming.liu_20160328152822_8c855119-3144-49fb-a565-c0da6549675c
 Total jobs = 1
